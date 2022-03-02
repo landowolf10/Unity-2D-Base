@@ -17,17 +17,20 @@ public class PlayerMain : MonoBehaviour
     [Header("Movement variables")]
     [SerializeField] private float movementAcceleration = 70;
     [SerializeField] private float maxMoveSpeed = 12;
-    [SerializeField] private float linearDrag;
+    [SerializeField] private float groundLinearDrag = 10f;
     private float horizontalInput;
     private bool changingDirection => (rb.velocity.x > 0f && horizontalInput < 0f) || (rb.velocity.x < 0f && horizontalInput > 0f);
     private bool facingRight = true;
 
     [Header("Jump variables")]
     [SerializeField] private float jumpForce = 12;
+    [SerializeField] private float jumpLinearDrag = 2.5f;
     [SerializeField] private float gravity = 1f;
-    [SerializeField] private float fallMultiplier = 5f;
-    [SerializeField] private bool canJump;
-    [SerializeField] private float hangTime;
+    [SerializeField] private float _fallMultiplier = 8f;
+    [SerializeField] private float lowJumpFallMultiplier = 5f;
+    [SerializeField] private bool canJump = true;
+    Dictionary<string, bool> onGround;
+    [SerializeField] private float hangTime = 0.2f;
     private float hangTimeCounter;
 
     [Header("Ground collision variables")]
@@ -47,51 +50,57 @@ public class PlayerMain : MonoBehaviour
     {
         horizontalInput = playerController.playerInput().x;
         //Dictionary that stores true or false depending if each transform object is on the ground.
-        Dictionary<string, bool> onGround = isGrounded(groundCheck1, groundCheck2, groundLayer);
+        onGround = playerController.isGrounded(groundCheck1, groundCheck2, groundLayer);
 
-        if (Input.GetButtonDown("Jump") && (onGround["grounded1"] || onGround["grounded2"]))
+        if (Input.GetButtonDown("Jump") && hangTimeCounter > 0)
             canJump = true;
+
+        //Run animation
+        animator.SetBool("isGrounded", (onGround["grounded1"] || onGround["grounded2"]));
+        animator.SetFloat("horizontalDirection", Mathf.Abs(horizontalInput));
+
+        if ((horizontalInput > 0 && !facingRight) || horizontalInput < 0 && facingRight)
+            flipCharacter();
+
+        if ((!onGround["grounded1"] || !onGround["grounded2"]))
+        {
+            //If the player is not touching the ground, then the hang time counter begins to decrease,
+            //and while the counter is greater than the hang time (0.2) the player can jump.
+            hangTimeCounter -= Time.deltaTime;
+            return;
+        }
+
+        //Hang time counter will have the hang time value (0.2) only if the player is on the ground,
+        //and if the hang time counter is greater than 0 (in this case it is because it now has the 0.2 value)
+        //then the player can jump.
+        //In other words, the player only has 0.2 seconds to jump after leaving the ground.
+        hangTimeCounter = hangTime;
     }
 
     void FixedUpdate()
     {
         playerController.moveCharacter(rb, horizontalInput, movementAcceleration, maxMoveSpeed);
+        onGround = playerController.isGrounded(groundCheck1, groundCheck2, groundLayer);
 
-        if(canJump)
+        if (canJump)
         {
-            jump(rb, jumpForce);
+            playerController.jump(rb, jumpForce);
             canJump = false;
+            hangTimeCounter = 0f;
         }
 
-        applyLinearDrag();
-    }
-
-    private void applyLinearDrag()
-    {
-        //Begins to deaccelerate if the horizontal input is less than 0.4 or the
-        //player is changing the direction of the movement.
-        if (Mathf.Abs(horizontalInput) < 0.4f || changingDirection)
-            rb.drag = linearDrag;
+        if ((onGround["grounded1"] || onGround["grounded2"]))
+            playerController.applyGroundLinearDrag(rb, horizontalInput, changingDirection, groundLinearDrag);
         else
-            rb.drag = 0;
+        {
+            playerController.applyJumpLinearDrag(rb, jumpLinearDrag);
+            playerController.fallMultiplier(rb, _fallMultiplier, lowJumpFallMultiplier);
+        }
     }
 
-    public void jump(Rigidbody2D rb, float jumpForce)
+    public void flipCharacter()
     {
-        rb.velocity = new Vector2(rb.velocity.x, 0); //Reset vertical velocity
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-    }
-
-    public Dictionary<string, bool> isGrounded(Transform groundCheck1, Transform groundCheck2,
-        LayerMask groundLayer)
-    {
-        bool grounded1 = Physics2D.OverlapCircle(groundCheck1.position, 0.2f, groundLayer);
-        bool grounded2 = Physics2D.OverlapCircle(groundCheck2.position, 0.2f, groundLayer);
-
-        Dictionary<string, bool> onGround = new Dictionary<string, bool>();
-        onGround.Add("grounded1", grounded1);
-        onGround.Add("grounded2", grounded2);
-
-        return onGround;
+        facingRight = !facingRight;
+        transform.rotation = Quaternion.Euler(0, facingRight ? 0 : 180, 0);
     }
 }

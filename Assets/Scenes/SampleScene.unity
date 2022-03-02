@@ -192,6 +192,67 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+--- !u!1001 &426199847
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2024934283}
+    m_Modifications:
+    - target: {fileID: 210061863622159650, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_Name
+      value: platform
+      objectReference: {fileID: 0}
+    - target: {fileID: 210061863622159650, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.86
+      objectReference: {fileID: 0}
+    - target: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 16.980045
+      objectReference: {fileID: 0}
+    - target: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -305,6 +366,11 @@ Transform:
   m_Father: {fileID: 1758410895}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1407044771 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 410925827376979914, guid: 6db45b210768dea41ae25b32070977b4, type: 3}
+  m_PrefabInstance: {fileID: 426199847}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1758410892
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,7 +402,7 @@ Animator:
   m_GameObject: {fileID: 1758410892}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: a8d84d0dde71d1c4a8deb786882cd2d8, type: 2}
+  m_Controller: {fileID: 9100000, guid: e2b0f77bead80f740bdfda0864b59236, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -428,7 +494,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: e5d0dc4efe177144abbd505d980f8c52, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -476,12 +542,14 @@ MonoBehaviour:
     m_Bits: 8
   movementAcceleration: 50
   maxMoveSpeed: 12
-  linearDrag: 20
-  jumpForce: 12
+  groundLinearDrag: 10
+  jumpForce: 15
+  jumpLinearDrag: 2.5
   gravity: 1
-  fallMultiplier: 5
+  _fallMultiplier: 8
+  lowJumpFallMultiplier: 5
   canJump: 0
-  hangTime: 0
+  hangTime: 0.2
   groundCheck1: {fileID: 529915572}
   groundCheck2: {fileID: 1960757796}
 --- !u!4 &1892387018 stripped
@@ -547,6 +615,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1892387018}
+  - {fileID: 1407044771}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
