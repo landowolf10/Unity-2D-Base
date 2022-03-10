@@ -14,23 +14,21 @@ public class PlayerMain : MonoBehaviour
     [SerializeField]
     private LayerMask groundLayer;
 
-    [Header("Movement variables")]
-    [SerializeField] private float movementAcceleration = 70;
-    [SerializeField] private float maxMoveSpeed = 12;
-    [SerializeField] private float groundLinearDrag = 10f;
     private float horizontalInput;
-    private bool changingDirection => (rb.velocity.x > 0f && horizontalInput < 0f) || (rb.velocity.x < 0f && horizontalInput > 0f);
     private bool facingRight = true;
 
-    [Header("Jump variables")]
+    /*[Header("Jump variables")]
     [SerializeField] private float jumpForce = 12;
     [SerializeField] private float jumpLinearDrag = 2.5f;
-    [SerializeField] private float gravity = 1f;
     [SerializeField] private float _fallMultiplier = 8f;
     [SerializeField] private float lowJumpFallMultiplier = 5f;
     [SerializeField] private bool canJump = true;
     Dictionary<string, bool> onGround;
     [SerializeField] private float hangTime = 0.2f;
+    private float hangTimeCounter;*/
+
+    private bool canJump = true;
+    private float hangTime = 0.2f;
     private float hangTimeCounter;
 
     [Header("Ground collision variables")]
@@ -50,14 +48,12 @@ public class PlayerMain : MonoBehaviour
     {
         horizontalInput = playerController.playerInput().x;
         //Dictionary that stores true or false depending if each transform object is on the ground.
-        onGround = playerController.isGrounded(groundCheck1, groundCheck2, groundLayer);
+        Dictionary<string, bool> onGround = playerController.isGrounded(groundCheck1, groundCheck2, groundLayer);
 
         if (Input.GetButtonDown("Jump") && hangTimeCounter > 0)
             canJump = true;
 
-        //Run animation
-        animator.SetBool("isGrounded", (onGround["grounded1"] || onGround["grounded2"]));
-        animator.SetFloat("horizontalDirection", Mathf.Abs(horizontalInput));
+        
 
         if ((horizontalInput > 0 && !facingRight) || horizontalInput < 0 && facingRight)
             flipCharacter();
@@ -79,22 +75,47 @@ public class PlayerMain : MonoBehaviour
 
     void FixedUpdate()
     {
-        playerController.moveCharacter(rb, horizontalInput, movementAcceleration, maxMoveSpeed);
-        onGround = playerController.isGrounded(groundCheck1, groundCheck2, groundLayer);
+        playerController.moveCharacter(rb);
+        Dictionary<string, bool> onGround = playerController.isGrounded(groundCheck1, groundCheck2, groundLayer);
+
+        Debug.Log("Can jump: " + canJump);
 
         if (canJump)
         {
-            playerController.jump(rb, jumpForce);
+            playerController.jump(rb);
             canJump = false;
             hangTimeCounter = 0f;
         }
 
         if ((onGround["grounded1"] || onGround["grounded2"]))
-            playerController.applyGroundLinearDrag(rb, horizontalInput, changingDirection, groundLinearDrag);
+            playerController.applyGroundLinearDrag(rb, horizontalInput);
+            
         else
         {
-            playerController.applyJumpLinearDrag(rb, jumpLinearDrag);
-            playerController.fallMultiplier(rb, _fallMultiplier, lowJumpFallMultiplier);
+            playerController.applyJumpLinearDrag(rb);
+            playerController.fallMultiplier(rb);
+        }
+    }
+
+    private void LateUpdate()
+    {
+        Dictionary<string, bool> onGround = playerController.isGrounded(groundCheck1, groundCheck2, groundLayer);
+        animator.SetBool("isJumping", false);
+        animator.SetBool("isFalling", false);
+
+        //Run animation
+        animator.SetBool("isGrounded", (onGround["grounded1"] || onGround["grounded2"]));
+        animator.SetFloat("horizontalDirection", Mathf.Abs(horizontalInput));
+
+        //Jump animation
+        if (!onGround["grounded1"] || !onGround["grounded2"])
+            animator.SetBool("isJumping", true);
+
+        //Fall animation
+        if (rb.velocity.y < 0f)
+        {
+            animator.SetBool("isFalling", true);
+            animator.SetBool("isJumping", false);
         }
     }
 

@@ -470,7 +470,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1758410892}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.15, y: -4.272079, z: 0}
+  m_LocalPosition: {x: -10.15, y: -4.55, z: 0}
   m_LocalScale: {x: 8.133774, y: 10.059635, z: 1}
   m_Children:
   - {fileID: 529915572}
@@ -540,16 +540,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  movementAcceleration: 50
-  maxMoveSpeed: 12
-  groundLinearDrag: 10
-  jumpForce: 15
-  jumpLinearDrag: 2.5
-  gravity: 1
-  _fallMultiplier: 8
-  lowJumpFallMultiplier: 5
-  canJump: 0
-  hangTime: 0.2
   groundCheck1: {fileID: 529915572}
   groundCheck2: {fileID: 1960757796}
 --- !u!4 &1892387018 stripped
