@@ -7,55 +7,50 @@ public class PlayerMain : MonoBehaviour
     [Header("Components")]
     private Rigidbody2D rb;
 
-    [Header("Animations")]
-    private Animator animator;
-
     [Header("Layer masks")]
-    [SerializeField]
-    private LayerMask groundLayer;
+    [SerializeField] private LayerMask groundLayer;
 
+    [Header("Movement variables")]
+    public PlayerController pc;
     private float horizontalInput;
     private bool facingRight = true;
 
-    /*[Header("Jump variables")]
-    [SerializeField] private float jumpForce = 12;
-    [SerializeField] private float jumpLinearDrag = 2.5f;
+    [Header("Jump variables")]
+    //[SerializeField] private float jumpForce = 20f;
+    //[SerializeField] private float jumpLinearDrag = 2.5f;
     [SerializeField] private float _fallMultiplier = 8f;
     [SerializeField] private float lowJumpFallMultiplier = 5f;
-    [SerializeField] private bool canJump = true;
-    Dictionary<string, bool> onGround;
-    [SerializeField] private float hangTime = 0.2f;
-    private float hangTimeCounter;*/
-
-    private bool canJump = true;
-    private float hangTime = 0.2f;
+    [SerializeField] private bool canJump;
+    [SerializeField] private float hangTime;
     private float hangTimeCounter;
 
     [Header("Ground collision variables")]
     [SerializeField] private Transform groundCheck1;
     [SerializeField] private Transform groundCheck2;
+    [SerializeField] private Dictionary<string, bool> _onGround;
 
-    private PlayerController playerController;
+    [Header("Animations")]
+    private Animator animator;
 
-    void Awake()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        playerController = new PlayerController();
+        pc = new PlayerController();
     }
 
+    // Update is called once per frame
     void Update()
     {
-        horizontalInput = playerController.playerInput().x;
+        horizontalInput = pc.playerInput().x;
+
         //Dictionary that stores true or false depending if each transform object is on the ground.
-        Dictionary<string, bool> onGround = playerController.isGrounded(groundCheck1, groundCheck2, groundLayer);
+        Dictionary<string, bool> onGround = pc.isGrounded(groundCheck1, groundCheck2, groundLayer);
 
         if (Input.GetButtonDown("Jump") && hangTimeCounter > 0)
             canJump = true;
 
-        
-
-        if ((horizontalInput > 0 && !facingRight) || horizontalInput < 0 && facingRight)
+        if ((pc.playerInput().x > 0 && !facingRight) || (pc.playerInput().x < 0 && facingRight))
             flipCharacter();
 
         if ((!onGround["grounded1"] || !onGround["grounded2"]))
@@ -73,33 +68,33 @@ public class PlayerMain : MonoBehaviour
         hangTimeCounter = hangTime;
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        playerController.moveCharacter(rb);
-        Dictionary<string, bool> onGround = playerController.isGrounded(groundCheck1, groundCheck2, groundLayer);
-
-        Debug.Log("Can jump: " + canJump);
+        Dictionary<string, bool> onGround = pc.isGrounded(groundCheck1, groundCheck2, groundLayer);
+        pc.moveCharacter(rb);
+        //pc.applyGroundLinearDrag(rb, horizontalInput, groundLinearDrag);
 
         if (canJump)
         {
-            playerController.jump(rb);
+            pc.jump(rb);
             canJump = false;
             hangTimeCounter = 0f;
         }
 
-        if ((onGround["grounded1"] || onGround["grounded2"]))
-            playerController.applyGroundLinearDrag(rb, horizontalInput);
-            
+        if (onGround["grounded1"] || onGround["grounded2"])
+        {
+            pc.applyGroundLinearDrag(rb, horizontalInput);
+        }
         else
         {
-            playerController.applyJumpLinearDrag(rb);
-            playerController.fallMultiplier(rb);
+            pc.applyJumpLinearDrag(rb);
+            pc.fallMultiplier(rb, _fallMultiplier, lowJumpFallMultiplier);
         }
     }
 
     private void LateUpdate()
     {
-        Dictionary<string, bool> onGround = playerController.isGrounded(groundCheck1, groundCheck2, groundLayer);
+        Dictionary<string, bool> onGround = pc.isGrounded(groundCheck1, groundCheck2, groundLayer);
         animator.SetBool("isJumping", false);
         animator.SetBool("isFalling", false);
 

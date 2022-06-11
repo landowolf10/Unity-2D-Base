@@ -540,6 +540,16 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  pc:
+    movementAcceleration: 70
+    maxMoveSpeed: 12
+    groundLinearDrag: 10
+  jumpForce: 20
+  jumpLinearDrag: 2.5
+  _fallMultiplier: 8
+  lowJumpFallMultiplier: 5
+  canJump: 0
+  hangTime: 0.2
   groundCheck1: {fileID: 529915572}
   groundCheck2: {fileID: 1960757796}
 --- !u!4 &1892387018 stripped
